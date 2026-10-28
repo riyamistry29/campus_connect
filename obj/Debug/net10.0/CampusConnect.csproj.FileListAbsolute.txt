@@ -189,3 +189,4 @@ C:\Users\riyam\OneDrive\Campus Connect\obj\Debug\net10.0\ref\CampusConnect.dll
 C:\Users\riyam\OneDrive\Campus Connect\bin\Debug\net10.0\package-lock.json
 C:\Users\riyam\OneDrive\Campus Connect\bin\Debug\net10.0\package.json
 C:\Users\riyam\OneDrive\Campus Connect\obj\Debug\net10.0\compressed\8t760zxkhz-{0}-t31fnsfoy4-t31fnsfoy4.gz
+C:\Users\riyam\OneDrive\Campus Connect\obj\Debug\net10.0\CampusConnect.sourcelink.json
