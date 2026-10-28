@@ -1,0 +1,16 @@
+{
+  "name": "campus-connect",
+  "version": "1.0.0",
+  "description": "**CampusConnect** is a full-stack academic web application built with **ASP.NET Core 10 MVC**, **PostgreSQL**, and **Entity Framework Core**. It is designed as a centralized college event platform where students can discover events, register for limited-seat workshops and competitions, track attendance, and where faculty/administrators can manage and moderate campus activities.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@prisma/client": "^5.22.0",
+    "prisma": "^5.22.0"
+  }
+}

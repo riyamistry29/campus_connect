@@ -1,0 +1,143 @@
+@model IEnumerable<CampusConnect.Models.EventCategory>
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+<div class="dashboard-container">
+    <!-- Admin Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="d-flex align-items-center gap-2 mb-4 px-2">
+            <div class="bg-danger text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0">Admin Center</h6>
+                <span class="small text-muted" style="font-size: 0.75rem;">Platform Administration</span>
+            </div>
+        </div>
+
+        <div class="sidebar-heading">Core Administration</div>
+        <a asp-action="Dashboard" class="sidebar-nav-item">
+            <i class="bi bi-speedometer2"></i> System Overview
+        </a>
+        <a asp-action="ModerateEvents" class="sidebar-nav-item">
+            <i class="bi bi-check2-circle"></i> Moderate Events
+        </a>
+        <a asp-action="Categories" class="sidebar-nav-item active">
+            <i class="bi bi-tags"></i> Event Categories
+        </a>
+        <a asp-action="Users" class="sidebar-nav-item">
+            <i class="bi bi-people"></i> User Management
+        </a>
+        <a asp-action="AllRegistrations" class="sidebar-nav-item">
+            <i class="bi bi-receipt"></i> All Registrations
+        </a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Event Categories</h2>
+                <p class="text-muted small mb-0">Manage interest classifications for college events and campus activities.</p>
+            </div>
+            <button type="button" class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#newCategoryModal">
+                <i class="bi bi-plus-lg me-1"></i> Add Category
+            </button>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Linked Events</th>
+                            <th>Created Date</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cat in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="category-icon-box" style="width: 36px; height: 36px; font-size: 1rem;">
+                                            <i class="bi @(cat.IconClass ?? "bi-calendar-event")"></i>
+                                        </div>
+                                        <div class="fw-bold text-dark">@cat.Name</div>
+                                    </div>
+                                </td>
+                                <td class="small text-muted" style="max-width: 300px;">
+                                    @(cat.Description ?? "No description provided.")
+                                </td>
+                                <td>
+                                    <span class="badge @(cat.Events.Any() ? "bg-primary-subtle text-primary" : "bg-light text-muted border") rounded-pill px-3 py-1">
+                                        @cat.Events.Count Event(s)
+                                    </span>
+                                </td>
+                                <td class="small text-muted">
+                                    @cat.CreatedAt.ToString("MMM dd, yyyy")
+                                </td>
+                                <td class="text-end">
+                                    @if (!cat.Events.Any())
+                                    {
+                                        <form asp-action="DeleteCategory" method="post" class="d-inline" onsubmit="return confirm('Delete category \'@cat.Name\'?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@cat.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Unused Category">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-light border text-muted" disabled title="Cannot delete category linked to active events">
+                                            <i class="bi bi-lock-fill"></i> In Use
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal: New Category -->
+<div class="modal fade" id="newCategoryModal" tabindex="-1" aria-labelledby="newCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" id="newCategoryModalLabel">Create Event Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="CreateCategory" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Category Name *</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Fine Arts & Literature" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Icon Class (Bootstrap Icons)</label>
+                        <input type="text" name="iconClass" class="form-control" placeholder="bi-paint-bucket" value="bi-calendar-event" />
+                        <small class="text-muted">Use any Bootstrap Icon name like bi-trophy, bi-laptop, bi-stars</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Description</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Explain the theme or audience for this category..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary-custom rounded-pill px-4">Create Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

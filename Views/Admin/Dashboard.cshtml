@@ -1,0 +1,284 @@
+@model CampusConnect.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Platform Admin Dashboard";
+}
+
+<div class="dashboard-container">
+    <!-- Admin Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="d-flex align-items-center gap-2 mb-4 px-2">
+            <div class="bg-danger text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0">Admin Center</h6>
+                <span class="small text-muted" style="font-size: 0.75rem;">Platform Administration</span>
+            </div>
+        </div>
+
+        <div class="sidebar-heading">Core Administration</div>
+        <a asp-action="Dashboard" class="sidebar-nav-item active">
+            <i class="bi bi-speedometer2"></i> System Overview
+        </a>
+        <a asp-action="ModerateEvents" class="sidebar-nav-item">
+            <i class="bi bi-check2-circle"></i> Moderate Events
+            @if (Model.PendingApprovalEvents > 0)
+            {
+                <span class="badge bg-warning text-dark ms-auto">@Model.PendingApprovalEvents</span>
+            }
+        </a>
+        <a asp-action="Categories" class="sidebar-nav-item">
+            <i class="bi bi-tags"></i> Event Categories
+        </a>
+        <a asp-action="Users" class="sidebar-nav-item">
+            <i class="bi bi-people"></i> User Management
+        </a>
+        <a asp-action="AllRegistrations" class="sidebar-nav-item">
+            <i class="bi bi-receipt"></i> All Registrations
+        </a>
+
+        <div class="sidebar-heading">Shortcuts</div>
+        <a asp-controller="Events" asp-action="Index" class="sidebar-nav-item">
+            <i class="bi bi-globe"></i> Public Event Catalog
+        </a>
+        <a asp-controller="Account" asp-action="Profile" class="sidebar-nav-item">
+            <i class="bi bi-person-gear"></i> Admin Profile
+        </a>
+    </aside>
+
+    <!-- Main Dashboard Area -->
+    <main class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">CampusConnect Administrator Overview</h2>
+                <p class="text-muted small mb-0">Platform metrics, event moderation pipeline, and registration analytics.</p>
+            </div>
+            <a asp-action="ModerateEvents" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                <i class="bi bi-clipboard-check me-1"></i> Review Pending Events (@Model.PendingApprovalEvents)
+            </a>
+        </div>
+
+        <!-- 6 Metrics Grid -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-xl-2">
+                <div class="stat-card p-3">
+                    <div>
+                        <div class="stat-val text-primary" style="font-size: 1.6rem;">@Model.TotalStudents</div>
+                        <div class="stat-label" style="font-size: 0.75rem;">Students</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-2">
+                <div class="stat-card p-3">
+                    <div>
+                        <div class="stat-val text-success" style="font-size: 1.6rem;">@Model.TotalOrganizers</div>
+                        <div class="stat-label" style="font-size: 0.75rem;">Organizers</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-2">
+                <div class="stat-card p-3">
+                    <div>
+                        <div class="stat-val text-dark" style="font-size: 1.6rem;">@Model.TotalEvents</div>
+                        <div class="stat-label" style="font-size: 0.75rem;">Total Events</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-2">
+                <div class="stat-card p-3">
+                    <div>
+                        <div class="stat-val text-warning" style="font-size: 1.6rem;">@Model.PendingApprovalEvents</div>
+                        <div class="stat-label" style="font-size: 0.75rem;">Pending</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-2">
+                <div class="stat-card p-3">
+                    <div>
+                        <div class="stat-val text-info" style="font-size: 1.6rem;">@Model.TotalRegistrations</div>
+                        <div class="stat-label" style="font-size: 0.75rem;">Registrations</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-2">
+                <div class="stat-card p-3">
+                    <div>
+                        <div class="stat-val text-danger" style="font-size: 1.6rem;">@Model.AttendanceRate%</div>
+                        <div class="stat-label" style="font-size: 0.75rem;">Attendance</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+            <!-- Line Chart: Monthly Registrations -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-graph-up text-primary me-2"></i>Registration Trends (Past 6 Months)</h5>
+                    <div style="height: 270px;">
+                        <canvas id="monthlyRegistrationsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doughnut Chart: Category Distribution -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart text-info me-2"></i>Event Categories Distribution</h5>
+                    <div style="height: 270px;">
+                        <canvas id="categoryDistributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Moderation & Recent Users Row -->
+        <div class="row g-4">
+            <!-- Pending Events -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-clock-history text-warning me-2"></i>Pending Moderation Queue</h5>
+                        <a asp-action="ModerateEvents" class="btn btn-sm btn-outline-secondary">View All</a>
+                    </div>
+
+                    @if (!Model.PendingEventsList.Any())
+                    {
+                        <div class="p-4 text-center text-muted small bg-light rounded-3">
+                            <i class="bi bi-check2-circle fs-3 text-success d-block mb-1"></i>
+                            Moderation queue is empty! All submitted events have been reviewed.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light small">
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Organizer</th>
+                                        <th>Category</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ev in Model.PendingEventsList)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold text-dark text-truncate" style="max-width: 200px;">
+                                                @ev.Title
+                                            </td>
+                                            <td class="small text-muted">@ev.Organizer.FullName</td>
+                                            <td><span class="badge bg-light text-dark border">@ev.Category.Name</span></td>
+                                            <td class="text-end">
+                                                <form asp-action="ChangeStatus" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@ev.Id" />
+                                                    <input type="hidden" name="status" value="@CampusConnect.Models.EventStatus.Published" />
+                                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                                                        Approve
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Recent Registered Users -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0"><i class="bi bi-people text-primary me-2"></i>Recent Sign-ups</h5>
+                        <a asp-action="Users" class="btn btn-sm btn-outline-secondary">View All</a>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        @foreach (var u in Model.RecentUsersList)
+                        {
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div>
+                                    <div class="fw-bold text-dark small">@u.FullName</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">@u.Email</div>
+                                </div>
+                                <span class="badge bg-light text-dark border small">@u.Department</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+    <script>
+        // 1. Monthly Trends Chart
+        const lineCtx = document.getElementById('monthlyRegistrationsChart').getContext('2d');
+        const months = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RegistrationMonthLabels));
+        const counts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RegistrationMonthCounts));
+
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'New Registrations',
+                    data: counts,
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.35,
+                    pointBackgroundColor: '#4f46e5',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 5 }
+                    }
+                }
+            }
+        });
+
+        // 2. Category Distribution Doughnut
+        const pieCtx = document.getElementById('categoryDistributionChart').getContext('2d');
+        const catLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryLabels));
+        const catCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CategoryEventCounts));
+
+        new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: catLabels,
+                datasets: [{
+                    data: catCounts,
+                    backgroundColor: [
+                        '#4f46e5', '#0ea5e9', '#10b981', '#f59e0b',
+                        '#8b5cf6', '#ec4899', '#f97316', '#64748b'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { boxWidth: 12, font: { size: 11 } }
+                    }
+                }
+            }
+        });
+    </script>
+}

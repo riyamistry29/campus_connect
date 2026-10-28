@@ -1,0 +1,88 @@
+@model CampusConnect.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Account Login";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
+                <div class="text-center mb-4">
+                    <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
+                         style="width: 56px; height: 56px;">
+                        <i class="bi bi-person-lock fs-2"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">Welcome Back</h3>
+                    <p class="text-muted small">Sign in to access your CampusConnect dashboard</p>
+                </div>
+
+                <form asp-action="Login" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ReturnUrl" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small rounded-3 p-2 mb-3" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label small fw-semibold text-muted">College Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="Email" id="emailInput" class="form-control bg-light border-start-0" placeholder="student@campusconnect.edu" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label asp-for="Password" class="form-label small fw-semibold text-muted">Password</label>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-key"></i></span>
+                            <input asp-for="Password" id="passwordInput" class="form-control bg-light border-start-0" placeholder="••••••••" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label small text-muted">Remember me on this browser</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-custom w-100 py-2 mb-3">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                    </button>
+                </form>
+
+                <!-- Quick Autofill Demo Credentials for Academic Evaluation -->
+                <div class="pt-3 border-top text-center">
+                    <span class="small text-muted d-block mb-2">⚡ Quick Test Login (Click to Fill):</span>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="fillCreds('admin@campusconnect.edu', 'Admin@12345')">
+                            Admin
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success rounded-pill" onclick="fillCreds('organizer@campusconnect.edu', 'Organizer@12345')">
+                            Organizer
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" onclick="fillCreds('student@campusconnect.edu', 'Student@12345')">
+                            Student
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4 text-muted small">
+                    Don't have an account yet? 
+                    <a asp-action="Register" class="text-primary fw-semibold text-decoration-none">Create Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function fillCreds(email, password) {
+            document.getElementById('emailInput').value = email;
+            document.getElementById('passwordInput').value = password;
+        }
+    </script>
+}

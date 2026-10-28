@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AspNetRoleClaims {
+  Id          Int         @id(map: "PK_AspNetRoleClaims") @default(autoincrement())
+  RoleId      String
+  ClaimType   String?
+  ClaimValue  String?
+  AspNetRoles AspNetRoles @relation(fields: [RoleId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetRoleClaims_AspNetRoles_RoleId")
+
+  @@index([RoleId], map: "IX_AspNetRoleClaims_RoleId")
+}
+
+model AspNetRoles {
+  Id               String             @id(map: "PK_AspNetRoles")
+  Name             String?            @db.VarChar(256)
+  NormalizedName   String?            @unique(map: "RoleNameIndex") @db.VarChar(256)
+  ConcurrencyStamp String?
+  AspNetRoleClaims AspNetRoleClaims[]
+  AspNetUserRoles  AspNetUserRoles[]
+}
+
+model AspNetUserClaims {
+  Id         Int     @id(map: "PK_AspNetUserClaims") @default(autoincrement())
+  UserId     String
+  ClaimType  String?
+  ClaimValue String?
+  Users      Users   @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetUserClaims_Users_UserId")
+
+  @@index([UserId], map: "IX_AspNetUserClaims_UserId")
+}
+
+model AspNetUserLogins {
+  LoginProvider       String
+  ProviderKey         String
+  ProviderDisplayName String?
+  UserId              String
+  Users               Users   @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetUserLogins_Users_UserId")
+
+  @@id([LoginProvider, ProviderKey], map: "PK_AspNetUserLogins")
+  @@index([UserId], map: "IX_AspNetUserLogins_UserId")
+}
+
+model AspNetUserRoles {
+  UserId      String
+  RoleId      String
+  AspNetRoles AspNetRoles @relation(fields: [RoleId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetUserRoles_AspNetRoles_RoleId")
+  Users       Users       @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetUserRoles_Users_UserId")
+
+  @@id([UserId, RoleId], map: "PK_AspNetUserRoles")
+  @@index([RoleId], map: "IX_AspNetUserRoles_RoleId")
+}
+
+model AspNetUserTokens {
+  UserId        String
+  LoginProvider String
+  Name          String
+  Value         String?
+  Users         Users   @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_AspNetUserTokens_Users_UserId")
+
+  @@id([UserId, LoginProvider, Name], map: "PK_AspNetUserTokens")
+}
+
+model CollegeEvents {
+  Id                   Int                  @id(map: "PK_CollegeEvents") @default(autoincrement())
+  Title                String               @db.VarChar(200)
+  Description          String
+  BannerUrl            String?              @db.VarChar(500)
+  StartDateTime        DateTime             @db.Timestamptz(6)
+  EndDateTime          DateTime             @db.Timestamptz(6)
+  Venue                String               @db.VarChar(200)
+  Capacity             Int
+  RegistrationDeadline DateTime             @db.Timestamptz(6)
+  Eligibility          String?              @db.VarChar(300)
+  Status               Int
+  CategoryId           Int
+  OrganizerId          String
+  CreatedAt            DateTime             @db.Timestamptz(6)
+  UpdatedAt            DateTime?            @db.Timestamptz(6)
+  EventCategories      EventCategories      @relation(fields: [CategoryId], references: [Id], onUpdate: NoAction, map: "FK_CollegeEvents_EventCategories_CategoryId")
+  Users                Users                @relation(fields: [OrganizerId], references: [Id], onUpdate: NoAction, map: "FK_CollegeEvents_Users_OrganizerId")
+  EventAnnouncements   EventAnnouncements[]
+  EventRegistrations   EventRegistrations[]
+
+  @@index([CategoryId], map: "IX_CollegeEvents_CategoryId")
+  @@index([OrganizerId], map: "IX_CollegeEvents_OrganizerId")
+  @@index([Status, StartDateTime], map: "IX_CollegeEvents_Status_StartDateTime")
+}
+
+model EventAnnouncements {
+  Id            Int           @id(map: "PK_EventAnnouncements") @default(autoincrement())
+  EventId       Int
+  Title         String        @db.VarChar(200)
+  Message       String
+  CreatedAt     DateTime      @db.Timestamptz(6)
+  CreatedById   String
+  CollegeEvents CollegeEvents @relation(fields: [EventId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_EventAnnouncements_CollegeEvents_EventId")
+  Users         Users         @relation(fields: [CreatedById], references: [Id], onUpdate: NoAction, map: "FK_EventAnnouncements_Users_CreatedById")
+
+  @@index([CreatedById], map: "IX_EventAnnouncements_CreatedById")
+  @@index([EventId], map: "IX_EventAnnouncements_EventId")
+}
+
+model EventCategories {
+  Id            Int             @id(map: "PK_EventCategories") @default(autoincrement())
+  Name          String          @unique(map: "IX_EventCategories_Name") @db.VarChar(100)
+  Description   String?         @db.VarChar(500)
+  IconClass     String?         @db.VarChar(50)
+  CreatedAt     DateTime        @db.Timestamptz(6)
+  CollegeEvents CollegeEvents[]
+}
+
+model EventRegistrations {
+  Id                 Int           @id(map: "PK_EventRegistrations") @default(autoincrement())
+  EventId            Int
+  StudentId          String
+  RegisteredAt       DateTime      @db.Timestamptz(6)
+  Status             Int
+  AttendanceStatus   Int
+  AttendanceMarkedAt DateTime?     @db.Timestamptz(6)
+  Remarks            String?       @db.VarChar(200)
+  CollegeEvents      CollegeEvents @relation(fields: [EventId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_EventRegistrations_CollegeEvents_EventId")
+  Users              Users         @relation(fields: [StudentId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_EventRegistrations_Users_StudentId")
+
+  @@unique([EventId, StudentId], map: "IX_EventRegistrations_EventId_StudentId")
+  @@index([Status], map: "IX_EventRegistrations_Status")
+  @@index([StudentId], map: "IX_EventRegistrations_StudentId")
+}
+
+model Users {
+  Id                   String               @id(map: "PK_Users")
+  FullName             String
+  Department           String
+  StudentIdentifier    String?
+  CreatedAt            DateTime             @db.Timestamptz(6)
+  IsActive             Boolean
+  UserName             String?              @db.VarChar(256)
+  NormalizedUserName   String?              @unique(map: "UserNameIndex") @db.VarChar(256)
+  Email                String?              @db.VarChar(256)
+  NormalizedEmail      String?              @db.VarChar(256)
+  EmailConfirmed       Boolean
+  PasswordHash         String?
+  SecurityStamp        String?
+  ConcurrencyStamp     String?
+  PhoneNumber          String?
+  PhoneNumberConfirmed Boolean
+  TwoFactorEnabled     Boolean
+  LockoutEnd           DateTime?            @db.Timestamptz(6)
+  LockoutEnabled       Boolean
+  AccessFailedCount    Int
+  AspNetUserClaims     AspNetUserClaims[]
+  AspNetUserLogins     AspNetUserLogins[]
+  AspNetUserRoles      AspNetUserRoles[]
+  AspNetUserTokens     AspNetUserTokens[]
+  CollegeEvents        CollegeEvents[]
+  EventAnnouncements   EventAnnouncements[]
+  EventRegistrations   EventRegistrations[]
+
+  @@index([NormalizedEmail], map: "EmailIndex")
+}
+
+model EFMigrationsHistory {
+  MigrationId    String @id(map: "PK___EFMigrationsHistory") @db.VarChar(150)
+  ProductVersion String @db.VarChar(32)
+
+  @@map("__EFMigrationsHistory")
+}

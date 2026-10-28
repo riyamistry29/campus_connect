@@ -1,0 +1,180 @@
+@model CampusConnect.ViewModels.StudentRegistrationsViewModel
+@{
+    ViewData["Title"] = "My Registrations";
+}
+
+<div class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold display-6 mb-1">My Event Registrations</h1>
+            <p class="text-muted mb-0">Track your enrolled college events, status, attendance, and ticket confirmations.</p>
+        </div>
+        <a asp-controller="Events" asp-action="Index" class="btn btn-primary-custom mt-3 mt-md-0">
+            <i class="bi bi-search me-1"></i> Browse More Events
+        </a>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-pills mb-4" id="registrationsTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-pill px-4" id="upcoming-tab" data-bs-toggle="pill" data-bs-target="#upcoming" type="button" role="tab">
+                <i class="bi bi-calendar-check me-1"></i> Upcoming Events 
+                <span class="badge bg-primary text-white ms-1 rounded-pill">@Model.UpcomingRegistrations.Count</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4" id="past-tab" data-bs-toggle="pill" data-bs-target="#past" type="button" role="tab">
+                <i class="bi bi-clock-history me-1"></i> Past & Attended 
+                <span class="badge bg-secondary text-white ms-1 rounded-pill">@Model.PastRegistrations.Count</span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="registrationsTabContent">
+        <!-- Upcoming Tab -->
+        <div class="tab-pane fade show active" id="upcoming" role="tabpanel">
+            @if (!Model.UpcomingRegistrations.Any())
+            {
+                <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+                    <i class="bi bi-calendar-event fs-1 text-muted mb-3"></i>
+                    <h5 class="fw-bold">No Upcoming Registrations</h5>
+                    <p class="text-muted small mb-4">You are not currently enrolled in any upcoming events.</p>
+                    <div>
+                        <a asp-controller="Events" asp-action="Index" class="btn btn-primary-custom rounded-pill px-4">
+                            Explore Upcoming Events
+                        </a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var reg in Model.UpcomingRegistrations)
+                    {
+                        var ev = reg.Event;
+                        <div class="col-lg-6">
+                            <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
+                                <div class="row g-0 h-100">
+                                    <div class="col-sm-4 bg-light position-relative" style="min-height: 160px;">
+                                        <img src="@(string.IsNullOrWhiteSpace(ev.BannerUrl) ? "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=400&q=80" : ev.BannerUrl)" 
+                                             class="w-100 h-100" style="object-fit: cover;" alt="@ev.Title" />
+                                        <span class="category-tag" style="top: 0.5rem; left: 0.5rem; font-size: 0.65rem;">
+                                            @ev.Category.Name
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-8 p-3 p-md-4 d-flex flex-direction-column justify-content-between">
+                                        <div>
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="small text-muted"><i class="bi bi-calendar3 me-1"></i>@ev.StartDateTime.ToString("MMM dd, yyyy")</span>
+                                                @if (reg.Status == CampusConnect.Models.RegistrationStatus.Confirmed)
+                                                {
+                                                    <span class="badge bg-success-subtle text-success">Confirmed</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger-subtle text-danger">@reg.Status</span>
+                                                }
+                                            </div>
+                                            <h5 class="fw-bold mb-2 text-truncate" title="@ev.Title">@ev.Title</h5>
+                                            <div class="small text-muted mb-2"><i class="bi bi-geo-alt me-1 text-danger"></i>@ev.Venue</div>
+                                            <div class="small text-muted mb-3"><i class="bi bi-clock me-1 text-primary"></i>@ev.StartDateTime.ToString("hh:mm tt") - @ev.EndDateTime.ToString("hh:mm tt")</div>
+                                        </div>
+
+                                        <div class="d-flex gap-2 pt-2 border-top align-items-center">
+                                            <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="btn btn-sm btn-outline-custom flex-grow-1">
+                                                View Event
+                                            </a>
+                                            @if (reg.Status == CampusConnect.Models.RegistrationStatus.Confirmed && DateTime.UtcNow < ev.StartDateTime)
+                                            {
+                                                <form asp-action="CancelRegistration" method="post" onsubmit="return confirm('Cancel registration for this event?');">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="eventId" value="@ev.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancel Enrollment">
+                                                        <i class="bi bi-x-circle"></i> Cancel
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Past Tab -->
+        <div class="tab-pane fade" id="past" role="tabpanel">
+            @if (!Model.PastRegistrations.Any())
+            {
+                <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+                    <i class="bi bi-clock-history fs-1 text-muted mb-3"></i>
+                    <h5 class="fw-bold">No Past Events</h5>
+                    <p class="text-muted small mb-0">Events that have concluded will be recorded here with your attendance status.</p>
+                </div>
+            }
+            else
+            {
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Event Details</th>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Registration Status</th>
+                                    <th>Attendance</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var reg in Model.PastRegistrations)
+                                {
+                                    var ev = reg.Event;
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold text-dark text-truncate" style="max-width: 260px;">@ev.Title</div>
+                                            <small class="text-muted">@ev.Venue</small>
+                                        </td>
+                                        <td class="small">
+                                            @ev.StartDateTime.ToString("MMM dd, yyyy")
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">@ev.Category.Name</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge @(reg.Status == CampusConnect.Models.RegistrationStatus.Confirmed ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger")">
+                                                @reg.Status
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if (reg.AttendanceStatus == CampusConnect.Models.AttendanceStatus.Present)
+                                            {
+                                                <span class="badge bg-success"><i class="bi bi-check2 me-1"></i>Present</span>
+                                            }
+                                            else if (reg.AttendanceStatus == CampusConnect.Models.AttendanceStatus.Absent)
+                                            {
+                                                <span class="badge bg-danger"><i class="bi bi-x me-1"></i>Absent</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Not Marked</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="btn btn-sm btn-outline-secondary">
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

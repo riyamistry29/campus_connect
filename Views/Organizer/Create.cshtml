@@ -1,0 +1,146 @@
+@model CampusConnect.ViewModels.EventCreateEditViewModel
+@{
+    ViewData["Title"] = "Create New Event";
+}
+
+<div class="dashboard-container">
+    <!-- Sidebar Navigation -->
+    <aside class="dashboard-sidebar">
+        <div class="d-flex align-items-center gap-2 mb-4 px-2">
+            <div class="bg-success text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                <i class="bi bi-kanban"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0">Organizer Portal</h6>
+                <span class="small text-muted" style="font-size: 0.75rem;">Event Management</span>
+            </div>
+        </div>
+
+        <div class="sidebar-heading">Navigation</div>
+        <a asp-action="Dashboard" class="sidebar-nav-item">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a asp-action="MyEvents" class="sidebar-nav-item">
+            <i class="bi bi-calendar-event"></i> My Events
+        </a>
+        <a asp-action="Create" class="sidebar-nav-item active">
+            <i class="bi bi-plus-circle"></i> Create New Event
+        </a>
+
+        <div class="sidebar-heading">Account & Views</div>
+        <a asp-controller="Events" asp-action="Index" class="sidebar-nav-item">
+            <i class="bi bi-eye"></i> Public Events Page
+        </a>
+        <a asp-controller="Account" asp-action="Profile" class="sidebar-nav-item">
+            <i class="bi bi-person-gear"></i> Organizer Profile
+        </a>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Create New College Event</h2>
+                <p class="text-muted small mb-0">Fill in event specifications, dates, capacity, and publication status.</p>
+            </div>
+            <a asp-action="MyEvents" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to My Events
+            </a>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <form asp-action="Create" method="post" novalidate>
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger small rounded-3 p-2 mb-3" role="alert"></div>
+
+                <div class="row g-4">
+                    <!-- Title -->
+                    <div class="col-12">
+                        <label asp-for="Title" class="form-label small fw-semibold text-muted">Event Title *</label>
+                        <input asp-for="Title" class="form-control" placeholder="e.g. Annual CodeSpark 2026 Hackathon" />
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Category & Status -->
+                    <div class="col-md-6">
+                        <label asp-for="CategoryId" class="form-label small fw-semibold text-muted">Event Category *</label>
+                        <select asp-for="CategoryId" asp-items="Model.CategoryList" class="form-select">
+                            <option value="">-- Select Category --</option>
+                        </select>
+                        <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Status" class="form-label small fw-semibold text-muted">Initial Publication Status *</label>
+                        <select asp-for="Status" asp-items="Html.GetEnumSelectList<CampusConnect.Models.EventStatus>()" class="form-select"></select>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="col-12">
+                        <label asp-for="Description" class="form-label small fw-semibold text-muted">Event Description *</label>
+                        <textarea asp-for="Description" class="form-control" rows="5" placeholder="Provide complete event agenda, guest speakers, judging criteria, and details..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Banner URL -->
+                    <div class="col-12">
+                        <label asp-for="BannerUrl" class="form-label small fw-semibold text-muted">Event Banner Image URL</label>
+                        <input asp-for="BannerUrl" class="form-control" placeholder="https://images.unsplash.com/... (Leave empty for default banner)" />
+                        <span asp-validation-for="BannerUrl" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Dates & Times -->
+                    <div class="col-md-6">
+                        <label asp-for="StartDateTime" class="form-label small fw-semibold text-muted">Start Date & Time *</label>
+                        <input asp-for="StartDateTime" type="datetime-local" class="form-control" value="@Model.StartDateTime.ToString("yyyy-MM-ddTHH:mm")" />
+                        <span asp-validation-for="StartDateTime" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="EndDateTime" class="form-label small fw-semibold text-muted">End Date & Time *</label>
+                        <input asp-for="EndDateTime" type="datetime-local" class="form-control" value="@Model.EndDateTime.ToString("yyyy-MM-ddTHH:mm")" />
+                        <span asp-validation-for="EndDateTime" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Venue & Capacity -->
+                    <div class="col-md-6">
+                        <label asp-for="Venue" class="form-label small fw-semibold text-muted">Campus Venue / Room *</label>
+                        <input asp-for="Venue" class="form-control" placeholder="e.g. Auditorium Block A, Room 302" />
+                        <span asp-validation-for="Venue" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Capacity" class="form-label small fw-semibold text-muted">Maximum Attendee Capacity *</label>
+                        <input asp-for="Capacity" type="number" min="1" max="10000" class="form-control" />
+                        <span asp-validation-for="Capacity" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Registration Deadline & Eligibility -->
+                    <div class="col-md-6">
+                        <label asp-for="RegistrationDeadline" class="form-label small fw-semibold text-muted">Registration Deadline *</label>
+                        <input asp-for="RegistrationDeadline" type="datetime-local" class="form-control" value="@Model.RegistrationDeadline.ToString("yyyy-MM-ddTHH:mm")" />
+                        <span asp-validation-for="RegistrationDeadline" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Eligibility" class="form-label small fw-semibold text-muted">Eligibility & Prerequisites</label>
+                        <input asp-for="Eligibility" class="form-control" placeholder="e.g. Open to all engineering students" />
+                        <span asp-validation-for="Eligibility" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mt-5 pt-3 border-top d-flex justify-content-end gap-2">
+                    <a asp-action="MyEvents" class="btn btn-light rounded-pill px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary-custom rounded-pill px-5">
+                        <i class="bi bi-check-lg me-1"></i> Save & Publish Event
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

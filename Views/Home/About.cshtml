@@ -1,0 +1,146 @@
+@{
+    ViewData["Title"] = "Project Overview & Architecture";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <span class="badge bg-primary-subtle text-primary fw-bold text-uppercase px-3 py-2 rounded-pill mb-2">
+                    Academic Web Engineering
+                </span>
+                <h1 class="display-5 fw-bold mb-3">CampusConnect Architecture & Specifications</h1>
+                <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                    A production-style college event management system engineered using ASP.NET Core MVC, PostgreSQL 18, and Entity Framework Core.
+                </p>
+            </div>
+
+            <!-- Tech Stack Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-3 bg-white text-center">
+                        <i class="bi bi-code-slash fs-1 text-primary mb-2"></i>
+                        <h6 class="fw-bold mb-1">ASP.NET Core 10</h6>
+                        <span class="text-muted small">C# MVC Backend & Razor Views</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-3 bg-white text-center">
+                        <i class="bi bi-database fs-1 text-info mb-2"></i>
+                        <h6 class="fw-bold mb-1">PostgreSQL 18</h6>
+                        <span class="text-muted small">Relational Database & Npgsql EF Core</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-3 bg-white text-center">
+                        <i class="bi bi-shield-check fs-1 text-success mb-2"></i>
+                        <h6 class="fw-bold mb-1">ASP.NET Identity</h6>
+                        <span class="text-muted small">Role-Based Security & Hashed Passwords</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 p-3 bg-white text-center">
+                        <i class="bi bi-palette fs-1 text-warning mb-2"></i>
+                        <h6 class="fw-bold mb-1">Bootstrap 5 & JS</h6>
+                        <span class="text-muted small">Responsive UI, Icons & Chart.js</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Roles Matrix -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-5">
+                <h4 class="fw-bold mb-3"><i class="bi bi-person-badge text-primary me-2"></i>Role-Based Permissions Matrix</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Feature / Capability</th>
+                                <th class="text-center">Student</th>
+                                <th class="text-center">Event Organizer</th>
+                                <th class="text-center">Administrator</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Discover and search published events</td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Register & Cancel registrations (capacity checked)</td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                                <td class="text-center text-muted"><i class="bi bi-dash-circle"></i></td>
+                                <td class="text-center text-muted"><i class="bi bi-dash-circle"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Personal Student Dashboard & RSVP History</td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                                <td class="text-center text-muted"><i class="bi bi-dash-circle"></i></td>
+                                <td class="text-center text-muted"><i class="bi bi-dash-circle"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Create, Edit, and Manage Own Events</td>
+                                <td class="text-center text-muted"><i class="bi bi-dash-circle"></i></td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Post Event Announcements & Updates</td>
+                                <td class="text-center text-muted"><i class="bi bi-dash-circle"></i></td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Manage Registrations & Mark Attendance</td>
+                                <td class="text-center text-muted"><i class="bi bi-dash-circle"></i></td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Moderate Events (Approve, Reject, Cancel)</td>
+                                <td class="text-center text-muted"><i class="bi bi-dash-circle"></i></td>
+                                <td class="text-center text-muted"><i class="bi bi-dash-circle"></i></td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Manage Categories & Platform Audit Logs</td>
+                                <td class="text-center text-muted"><i class="bi bi-dash-circle"></i></td>
+                                <td class="text-center text-muted"><i class="bi bi-dash-circle"></i></td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pre-configured Credentials -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <h4 class="fw-bold mb-3"><i class="bi bi-key text-primary me-2"></i>Default Seed Accounts for Evaluation</h4>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="border rounded-3 p-3 bg-light">
+                            <span class="badge bg-danger mb-2">Administrator</span>
+                            <div class="fw-bold">admin@campusconnect.edu</div>
+                            <div class="small text-muted">Password: <code>Admin@12345</code></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded-3 p-3 bg-light">
+                            <span class="badge bg-success mb-2">Event Organizer</span>
+                            <div class="fw-bold">organizer@campusconnect.edu</div>
+                            <div class="small text-muted">Password: <code>Organizer@12345</code></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded-3 p-3 bg-light">
+                            <span class="badge bg-primary mb-2">Student</span>
+                            <div class="fw-bold">student@campusconnect.edu</div>
+                            <div class="small text-muted">Password: <code>Student@12345</code></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

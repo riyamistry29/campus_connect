@@ -1,0 +1,189 @@
+@model CampusConnect.ViewModels.StudentDashboardViewModel
+@{
+    ViewData["Title"] = "Student Dashboard";
+}
+
+<div class="container py-5">
+    <!-- Welcome Header Banner -->
+    <div class="card border-0 rounded-4 shadow-sm p-4 p-md-5 mb-5 text-white" 
+         style="background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <span class="badge bg-white text-primary fw-bold text-uppercase px-3 py-1 rounded-pill mb-2">
+                    Student Portal
+                </span>
+                <h1 class="fw-bold mb-2">Welcome back, @Model.Student.FullName!</h1>
+                <p class="mb-0 text-white-50">
+                    Department: <strong class="text-white">@Model.Student.Department</strong> 
+                    @if (!string.IsNullOrEmpty(Model.Student.StudentIdentifier))
+                    {
+                        <span> | ID: <strong class="text-white">@Model.Student.StudentIdentifier</strong></span>
+                    }
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a asp-controller="Events" asp-action="Index" class="btn btn-light text-primary fw-bold rounded-pill px-4 py-2 shadow-sm">
+                    <i class="bi bi-search me-1"></i> Discover Events
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Widgets -->
+    <div class="row g-4 mb-5">
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-val text-primary">@Model.TotalRegistered</div>
+                    <div class="stat-label">Total Enrolled</div>
+                </div>
+                <div class="stat-icon bg-primary-subtle text-primary">
+                    <i class="bi bi-ticket-perforated"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-val text-info">@Model.UpcomingEventsCount</div>
+                    <div class="stat-label">Upcoming Events</div>
+                </div>
+                <div class="stat-icon bg-info-subtle text-info">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-val text-success">@Model.AttendedEventsCount</div>
+                    <div class="stat-label">Events Attended</div>
+                </div>
+                <div class="stat-icon bg-success-subtle text-success">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="stat-card">
+                <div>
+                    <div class="stat-val text-secondary">@Model.PastEventsCount</div>
+                    <div class="stat-label">Past Events</div>
+                </div>
+                <div class="stat-icon bg-secondary-subtle text-secondary">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Registrations -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-clock-history text-primary me-2"></i>Recent Event Registrations</h5>
+                    <a asp-action="Index" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        View All My Events
+                    </a>
+                </div>
+
+                @if (!Model.RecentRegistrations.Any())
+                {
+                    <div class="p-5 text-center bg-light rounded-3">
+                        <i class="bi bi-ticket-detailed fs-1 text-muted mb-2 d-block"></i>
+                        <h6 class="fw-bold">No Registrations Yet</h6>
+                        <p class="text-muted small mb-3">You haven't registered for any college events. Explore the event catalog to get started!</p>
+                        <a asp-controller="Events" asp-action="Index" class="btn btn-sm btn-primary-custom rounded-pill">Explore Events</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Event Title</th>
+                                    <th>Date & Time</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var reg in Model.RecentRegistrations)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold text-dark text-truncate" style="max-width: 220px;" title="@reg.Event.Title">
+                                                @reg.Event.Title
+                                            </div>
+                                            <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>@reg.Event.Venue</small>
+                                        </td>
+                                        <td class="small">
+                                            @reg.Event.StartDateTime.ToString("MMM dd, yyyy")<br>
+                                            <span class="text-muted">@reg.Event.StartDateTime.ToString("hh:mm tt")</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">
+                                                @reg.Event.Category.Name
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @if (reg.Status == CampusConnect.Models.RegistrationStatus.Confirmed)
+                                            {
+                                                <span class="badge bg-success-subtle text-success">Confirmed</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger">@reg.Status</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            <a asp-controller="Events" asp-action="Details" asp-route-id="@reg.EventId" class="btn btn-sm btn-outline-custom">
+                                                Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Recommended Events Side Column -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <h5 class="fw-bold mb-3"><i class="bi bi-stars text-warning me-2"></i>Recommended For You</h5>
+
+                @if (!Model.RecommendedEvents.Any())
+                {
+                    <div class="p-3 text-center text-muted small bg-light rounded-3">
+                        No new recommendations right now. You are enrolled in all upcoming events!
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var ev in Model.RecommendedEvents)
+                        {
+                            <div class="p-3 rounded-3 border bg-light">
+                                <span class="badge bg-primary-subtle text-primary small mb-1">@ev.Category.Name</span>
+                                <h6 class="fw-bold mb-1 text-truncate" title="@ev.Title">@ev.Title</h6>
+                                <div class="small text-muted mb-2"><i class="bi bi-calendar3 me-1"></i>@ev.StartDateTime.ToString("MMM dd, yyyy • hh:mm tt")</div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="small text-success fw-bold">@ev.AvailableSeats seats left</span>
+                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

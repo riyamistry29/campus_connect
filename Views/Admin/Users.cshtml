@@ -1,0 +1,97 @@
+@model IEnumerable<CampusConnect.ViewModels.UserRoleManagementViewModel>
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="dashboard-container">
+    <!-- Admin Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="d-flex align-items-center gap-2 mb-4 px-2">
+            <div class="bg-danger text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0">Admin Center</h6>
+                <span class="small text-muted" style="font-size: 0.75rem;">Platform Administration</span>
+            </div>
+        </div>
+
+        <div class="sidebar-heading">Core Administration</div>
+        <a asp-action="Dashboard" class="sidebar-nav-item">
+            <i class="bi bi-speedometer2"></i> System Overview
+        </a>
+        <a asp-action="ModerateEvents" class="sidebar-nav-item">
+            <i class="bi bi-check2-circle"></i> Moderate Events
+        </a>
+        <a asp-action="Categories" class="sidebar-nav-item">
+            <i class="bi bi-tags"></i> Event Categories
+        </a>
+        <a asp-action="Users" class="sidebar-nav-item active">
+            <i class="bi bi-people"></i> User Management
+        </a>
+        <a asp-action="AllRegistrations" class="sidebar-nav-item">
+            <i class="bi bi-receipt"></i> All Registrations
+        </a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">User & Role Directory</h2>
+                <p class="text-muted small mb-0">List of all students, organizers, and administrators registered in CampusConnect.</p>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>User Name & Email</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                            <th>Student ID / Roll No</th>
+                            <th>Registration Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            var user = item.User;
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" 
+                                             style="width: 36px; height: 36px; font-size: 0.85rem;">
+                                            @(string.IsNullOrEmpty(user.FullName) ? "U" : user.FullName[0].ToString().ToUpper())
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark">@user.FullName</div>
+                                            <div class="small text-muted">@user.Email</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @foreach (var role in item.Roles)
+                                    {
+                                        <span class="badge @(role == "Admin" ? "bg-danger-subtle text-danger" : role == "Organizer" ? "bg-success-subtle text-success" : "bg-primary-subtle text-primary") rounded-pill px-3 py-1">
+                                            @role
+                                        </span>
+                                    }
+                                </td>
+                                <td class="small">@user.Department</td>
+                                <td class="small font-monospace">@(user.StudentIdentifier ?? "—")</td>
+                                <td class="small text-muted">@user.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    <span class="badge bg-success-subtle text-success">Active</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>

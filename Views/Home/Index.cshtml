@@ -1,0 +1,183 @@
+@model IEnumerable<CampusConnect.Models.CollegeEvent>
+@{
+    ViewData["Title"] = "Home";
+    var categories = ViewBag.Categories as List<CampusConnect.Models.EventCategory> ?? new();
+}
+
+<!-- Hero -->
+<section class="hero-wrapper">
+    <div class="container">
+        <div class="hero-badge">
+            <i class="bi bi-mortarboard-fill me-1"></i> CampusConnect — College Event Management System
+        </div>
+        <h1 class="hero-title">Discover &amp; Register for <span>Campus Events</span></h1>
+        <p class="text-muted mb-4" style="max-width: 550px;">
+            Browse workshops, hackathons, cultural events and more — all in one place.
+        </p>
+
+        <form asp-controller="Events" asp-action="Index" method="get" class="mb-4 d-flex gap-2" style="max-width: 480px;">
+            <input type="text" name="search" class="form-control" placeholder="Search events..." />
+            <button type="submit" class="btn btn-primary-custom px-4">Search</button>
+        </form>
+
+        <div class="d-flex gap-4">
+            <div>
+                <span class="fw-bold text-primary fs-5">@(ViewBag.TotalEventsCount ?? 0)+</span>
+                <span class="text-muted ms-1 small">Events</span>
+            </div>
+            <div>
+                <span class="fw-bold text-success fs-5">@(ViewBag.TotalRegistrationsCount ?? 0)+</span>
+                <span class="text-muted ms-1 small">Registrations</span>
+            </div>
+            <div>
+                <span class="fw-bold text-info fs-5">@(ViewBag.TotalCategoriesCount ?? 0)</span>
+                <span class="text-muted ms-1 small">Categories</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories -->
+@if (categories.Any())
+{
+    <section class="py-4 bg-white border-bottom">
+        <div class="container">
+            <h5 class="fw-bold mb-3">Browse by Category</h5>
+            <div class="row row-cols-2 row-cols-md-4 g-3">
+                @foreach (var cat in categories)
+                {
+                    <div class="col">
+                        <a asp-controller="Events" asp-action="Index" asp-route-categoryId="@cat.Id" class="category-pill">
+                            <div class="category-icon-box">
+                                <i class="bi @(cat.IconClass ?? "bi-calendar-event")"></i>
+                            </div>
+                            <div>
+                                <div class="fw-semibold small text-truncate">@cat.Name</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">@(cat.Events?.Count ?? 0) events</div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- Events Grid -->
+<section class="py-4">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Upcoming Events</h5>
+            <a asp-controller="Events" asp-action="Index" class="btn btn-outline-custom btn-sm">View All</a>
+        </div>
+
+        <div class="row g-4">
+            @if (!Model.Any())
+            {
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-calendar-x fs-1 text-muted d-block mb-2"></i>
+                    <p class="text-muted">No upcoming events. Check back soon!</p>
+                    <a asp-controller="Events" asp-action="Index" class="btn btn-primary-custom">Browse All</a>
+                </div>
+            }
+            else
+            {
+                @foreach (var ev in Model)
+                {
+                    <div class="col-lg-4 col-md-6">
+                        <div class="event-card">
+                            <div class="event-card-banner">
+                                <img src="@(string.IsNullOrWhiteSpace(ev.BannerUrl) ? "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80" : ev.BannerUrl)"
+                                     alt="@ev.Title" loading="lazy" />
+                                <span class="category-tag">@ev.Category.Name</span>
+                                @if (ev.IsFull)
+                                {
+                                    <span class="badge bg-danger status-badge-overlay rounded-pill px-2">Full</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success status-badge-overlay rounded-pill px-2">Open</span>
+                                }
+                            </div>
+                            <div class="event-card-body">
+                                <div class="event-meta-item">
+                                    <i class="bi bi-calendar3"></i>
+                                    <span>@ev.StartDateTime.ToString("MMM dd, yyyy • hh:mm tt")</span>
+                                </div>
+                                <h6 class="event-title">@ev.Title</h6>
+                                <div class="event-meta-item">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <span class="text-truncate">@ev.Venue</span>
+                                </div>
+                                <div class="event-meta-item">
+                                    <i class="bi bi-people"></i>
+                                    <span>@ev.AvailableSeats / @ev.Capacity seats available</span>
+                                </div>
+                            </div>
+                            <div class="event-card-footer">
+                                <span class="small text-muted">
+                                    <i class="bi bi-clock me-1"></i>RSVP by @ev.RegistrationDeadline.ToString("MMM dd")
+                                </span>
+                                <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="btn btn-outline-custom btn-sm">
+                                    Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-4 bg-white border-top border-bottom">
+    <div class="container text-center">
+        <h5 class="fw-bold mb-4">How It Works</h5>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="p-4 border rounded-3 h-100">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width:52px;height:52px;font-size:1.3rem;">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h6 class="fw-bold">1. Discover Events</h6>
+                    <p class="text-muted small mb-0">Browse all published events by category, date, or name.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 border rounded-3 h-100">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width:52px;height:52px;font-size:1.3rem;">
+                        <i class="bi bi-ticket-perforated"></i>
+                    </div>
+                    <h6 class="fw-bold">2. Register</h6>
+                    <p class="text-muted small mb-0">Register for events with one click. Seats are limited and deadlines are enforced.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 border rounded-3 h-100">
+                    <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width:52px;height:52px;font-size:1.3rem;">
+                        <i class="bi bi-award"></i>
+                    </div>
+                    <h6 class="fw-bold">3. Attend</h6>
+                    <p class="text-muted small mb-0">Show up and your attendance is marked by the organizer.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-4">
+    <div class="container">
+        <div class="p-4 rounded-3 text-white text-center" style="background: #4f46e5;">
+            <h5 class="fw-bold mb-2">Want to organize an event?</h5>
+            <p class="small mb-3 opacity-75">Sign up as an organizer to create events, manage attendees, and track attendance.</p>
+            <a asp-controller="Account" asp-action="Register" class="btn btn-light text-primary fw-bold px-4">
+                Get Started
+            </a>
+        </div>
+    </div>
+</section>

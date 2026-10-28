@@ -1,0 +1,219 @@
+@model CampusConnect.ViewModels.EventFilterViewModel
+@{
+    ViewData["Title"] = "Explore Campus Events";
+}
+
+<div class="container py-5">
+    <!-- Header -->
+    <div class="mb-4">
+        <h1 class="fw-bold display-6 mb-1">Explore Campus Events</h1>
+        <p class="text-muted">Discover hackathons, seminars, cultural fests, workshops, and sports across the campus.</p>
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-5">
+        <form method="get" asp-action="Index">
+            <div class="row g-3 align-items-center">
+                <!-- Search bar -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="search" value="@Model.Search" class="form-control bg-light border-start-0" 
+                               placeholder="Search by title, venue, or description..." />
+                    </div>
+                </div>
+
+                <!-- Category dropdown -->
+                <div class="col-lg-3 col-md-6">
+                    <select name="categoryId" class="form-select bg-light">
+                        <option value="">All Categories</option>
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <option value="@cat.Id" selected="@(Model.CategoryId == cat.Id ? "selected" : null)">
+                                @cat.Name
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Sort By -->
+                <div class="col-lg-3 col-md-6">
+                    <select name="sortBy" class="form-select bg-light">
+                        <option value="date_asc" selected="@(Model.SortBy == "date_asc" ? "selected" : null)">Date (Earliest First)</option>
+                        <option value="date_desc" selected="@(Model.SortBy == "date_desc" ? "selected" : null)">Date (Latest First)</option>
+                        <option value="popular" selected="@(Model.SortBy == "popular" ? "selected" : null)">Most Popular (Registrations)</option>
+                        <option value="capacity" selected="@(Model.SortBy == "capacity" ? "selected" : null)">Largest Capacity</option>
+                    </select>
+                </div>
+
+                <!-- Filter Actions -->
+                <div class="col-lg-2 col-md-6 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom flex-grow-1">
+                        Apply
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary" title="Reset Filters">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Timeframe Filter Tabs -->
+            <div class="d-flex flex-wrap gap-2 mt-3 pt-3 border-top align-items-center">
+                <span class="small fw-semibold text-muted me-2">Timeframe:</span>
+                <button type="submit" name="timeFrame" value="upcoming" 
+                        class="btn btn-sm rounded-pill @(Model.TimeFrame == "upcoming" ? "btn-primary" : "btn-light border")">
+                    Upcoming
+                </button>
+                <button type="submit" name="timeFrame" value="this_week" 
+                        class="btn btn-sm rounded-pill @(Model.TimeFrame == "this_week" ? "btn-primary" : "btn-light border")">
+                    This Week
+                </button>
+                <button type="submit" name="timeFrame" value="today" 
+                        class="btn btn-sm rounded-pill @(Model.TimeFrame == "today" ? "btn-primary" : "btn-light border")">
+                    Today
+                </button>
+                <button type="submit" name="timeFrame" value="past" 
+                        class="btn btn-sm rounded-pill @(Model.TimeFrame == "past" ? "btn-primary" : "btn-light border")">
+                    Past Events
+                </button>
+                <button type="submit" name="timeFrame" value="all" 
+                        class="btn btn-sm rounded-pill @(Model.TimeFrame == "all" ? "btn-primary" : "btn-light border")">
+                    All Events
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Count Banner -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="text-muted small">
+            Showing <strong class="text-dark">@Model.Events.Count</strong> of <strong class="text-dark">@Model.TotalEvents</strong> events found
+        </div>
+    </div>
+
+    <!-- Events Grid -->
+    @if (!Model.Events.Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white my-4">
+            <i class="bi bi-calendar-x fs-1 text-muted mb-3"></i>
+            <h4 class="fw-bold">No Events Match Your Filters</h4>
+            <p class="text-muted small mb-4">Try clearing your search terms or picking another category.</p>
+            <div>
+                <a asp-action="Index" class="btn btn-primary-custom rounded-pill px-4">
+                    Reset All Filters
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var ev in Model.Events)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="event-card">
+                        <div class="event-card-banner">
+                            <img src="@(string.IsNullOrWhiteSpace(ev.BannerUrl) ? "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80" : ev.BannerUrl)" 
+                                 alt="@ev.Title" loading="lazy" />
+                            <span class="category-tag">@ev.Category.Name</span>
+                            @if (ev.IsFull)
+                            {
+                                <span class="badge bg-danger status-badge-overlay rounded-pill px-3 py-1">Sold Out</span>
+                            }
+                            else if (DateTime.UtcNow > ev.RegistrationDeadline)
+                            {
+                                <span class="badge bg-secondary status-badge-overlay rounded-pill px-3 py-1">Closed</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success status-badge-overlay rounded-pill px-3 py-1">Open</span>
+                            }
+                        </div>
+                        <div class="event-card-body">
+                            <div class="event-meta-item">
+                                <i class="bi bi-calendar3"></i>
+                                <span>@ev.StartDateTime.ToString("ddd, MMM dd, yyyy • hh:mm tt")</span>
+                            </div>
+                            <h4 class="event-title" title="@ev.Title">@ev.Title</h4>
+                            <div class="event-meta-item">
+                                <i class="bi bi-geo-alt"></i>
+                                <span class="text-truncate">@ev.Venue</span>
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="bi bi-person-badge"></i>
+                                <span class="text-truncate">Organized by @ev.Organizer.FullName</span>
+                            </div>
+
+                            <!-- Seats progress bar -->
+                            <div class="mt-3 pt-2 border-top">
+                                <div class="d-flex justify-content-between small text-muted mb-1">
+                                    <span>Seats Remaining</span>
+                                    <span class="fw-bold text-dark">@ev.AvailableSeats / @ev.Capacity</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    @{
+                                        var pct = ev.Capacity > 0 ? (int)((double)ev.ConfirmedRegistrationsCount / ev.Capacity * 100) : 0;
+                                    }
+                                    <div class="progress-bar @(pct >= 90 ? "bg-danger" : pct >= 70 ? "bg-warning" : "bg-primary")" 
+                                         role="progressbar" style="width: @pct%;" aria-valuenow="@pct" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="event-card-footer">
+                            <span class="small text-muted">
+                                <i class="bi bi-clock-history me-1"></i>Deadline: @ev.RegistrationDeadline.ToString("MMM dd")
+                            </span>
+                            <a asp-action="Details" asp-route-id="@ev.Id" class="btn btn-sm btn-outline-custom">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="mt-5" aria-label="Events pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" 
+                           asp-route-page="@(Model.PageNumber - 1)" 
+                           asp-route-search="@Model.Search" 
+                           asp-route-categoryId="@Model.CategoryId" 
+                           asp-route-timeFrame="@Model.TimeFrame" 
+                           asp-route-sortBy="@Model.SortBy">
+                            Previous
+                        </a>
+                    </li>
+                    @for (int p = 1; p <= Model.TotalPages; p++)
+                    {
+                        <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                            <a class="page-link" asp-action="Index" 
+                               asp-route-page="@p" 
+                               asp-route-search="@Model.Search" 
+                               asp-route-categoryId="@Model.CategoryId" 
+                               asp-route-timeFrame="@Model.TimeFrame" 
+                               asp-route-sortBy="@Model.SortBy">
+                                @p
+                            </a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" 
+                           asp-route-page="@(Model.PageNumber + 1)" 
+                           asp-route-search="@Model.Search" 
+                           asp-route-categoryId="@Model.CategoryId" 
+                           asp-route-timeFrame="@Model.TimeFrame" 
+                           asp-route-sortBy="@Model.SortBy">
+                            Next
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    }
+</div>

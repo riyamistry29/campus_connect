@@ -1,0 +1,90 @@
+@model CampusConnect.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "User Profile & Settings";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1">My Account Profile</h2>
+                    <p class="text-muted small mb-0">Manage your personal information and student credentials</p>
+                </div>
+                <a asp-action="ChangePassword" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="bi bi-shield-lock me-1"></i> Change Password
+                </a>
+            </div>
+
+            <div class="row g-4">
+                <!-- User Summary Card -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 shadow" 
+                             style="width: 80px; height: 80px; font-size: 2rem; font-weight: bold;">
+                            @(string.IsNullOrEmpty(Model.FullName) ? "U" : Model.FullName[0].ToString().ToUpper())
+                        </div>
+                        <h5 class="fw-bold mb-1">@Model.FullName</h5>
+                        <div class="text-muted small mb-2">@Model.Email</div>
+                        <div>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">
+                                @Model.Role
+                            </span>
+                        </div>
+                        <hr class="my-3 opacity-25">
+                        <div class="text-start small text-muted">
+                            <div class="mb-2"><i class="bi bi-building me-2 text-primary"></i><strong>Dept:</strong> @Model.Department</div>
+                            @if (!string.IsNullOrEmpty(Model.StudentIdentifier))
+                            {
+                                <div class="mb-2"><i class="bi bi-card-text me-2 text-primary"></i><strong>ID:</strong> @Model.StudentIdentifier</div>
+                            }
+                            <div><i class="bi bi-calendar-check me-2 text-primary"></i><strong>Joined:</strong> @Model.MemberSince.ToString("MMM yyyy")</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Edit Form -->
+                <div class="col-md-8">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <h5 class="fw-bold mb-3 border-bottom pb-2">Edit Information</h5>
+                        <form asp-action="Profile" method="post">
+                            @Html.AntiForgeryToken()
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger small rounded-3 p-2 mb-3"></div>
+
+                            <div class="mb-3">
+                                <label asp-for="FullName" class="form-label small fw-semibold text-muted">Full Name</label>
+                                <input asp-for="FullName" class="form-control" />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label small fw-semibold text-muted">Email Address (Read Only)</label>
+                                <input asp-for="Email" class="form-control bg-light" readonly />
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Department" class="form-label small fw-semibold text-muted">Department / Branch</label>
+                                <input asp-for="Department" class="form-control" />
+                                <span asp-validation-for="Department" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="StudentIdentifier" class="form-label small fw-semibold text-muted">Student ID / Roll No</label>
+                                <input asp-for="StudentIdentifier" class="form-control" />
+                                <span asp-validation-for="StudentIdentifier" class="text-danger small"></span>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary-custom px-4">
+                                <i class="bi bi-save me-1"></i> Save Changes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

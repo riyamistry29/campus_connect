@@ -1,0 +1,238 @@
+@model CampusConnect.ViewModels.OrganizerDashboardViewModel
+@{
+    ViewData["Title"] = "Organizer Dashboard";
+}
+
+<div class="dashboard-container">
+    <!-- Sidebar Navigation -->
+    <aside class="dashboard-sidebar">
+        <div class="d-flex align-items-center gap-2 mb-4 px-2">
+            <div class="bg-success text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                <i class="bi bi-kanban"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0">Organizer Portal</h6>
+                <span class="small text-muted" style="font-size: 0.75rem;">Event Management</span>
+            </div>
+        </div>
+
+        <div class="sidebar-heading">Navigation</div>
+        <a asp-action="Dashboard" class="sidebar-nav-item active">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+        <a asp-action="MyEvents" class="sidebar-nav-item">
+            <i class="bi bi-calendar-event"></i> My Events
+        </a>
+        <a asp-action="Create" class="sidebar-nav-item">
+            <i class="bi bi-plus-circle"></i> Create New Event
+        </a>
+
+        <div class="sidebar-heading">Account & Views</div>
+        <a asp-controller="Events" asp-action="Index" class="sidebar-nav-item">
+            <i class="bi bi-eye"></i> Public Events Page
+        </a>
+        <a asp-controller="Account" asp-action="Profile" class="sidebar-nav-item">
+            <i class="bi bi-person-gear"></i> Organizer Profile
+        </a>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-content">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Organizer Dashboard</h2>
+                <p class="text-muted small mb-0">Welcome, @Model.Organizer.FullName (@Model.Organizer.Department)</p>
+            </div>
+            <a asp-action="Create" class="btn btn-primary-custom">
+                <i class="bi bi-plus-lg me-1"></i> Create Event
+            </a>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val text-primary">@Model.TotalEvents</div>
+                        <div class="stat-label">Events Created</div>
+                    </div>
+                    <div class="stat-icon bg-primary-subtle text-primary">
+                        <i class="bi bi-calendar4-week"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val text-success">@Model.TotalRegistrations</div>
+                        <div class="stat-label">Total Registrations</div>
+                    </div>
+                    <div class="stat-icon bg-success-subtle text-success">
+                        <i class="bi bi-people"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val text-info">@Model.TotalAttended</div>
+                        <div class="stat-label">Verified Attendees</div>
+                    </div>
+                    <div class="stat-icon bg-info-subtle text-info">
+                        <i class="bi bi-person-check"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val text-warning">@Model.AttendanceRate%</div>
+                        <div class="stat-label">Attendance Rate</div>
+                    </div>
+                    <div class="stat-icon bg-warning-subtle text-warning">
+                        <i class="bi bi-pie-chart"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-line text-primary me-2"></i>Event Registrations vs Seat Capacity</h5>
+                    <div style="height: 280px;">
+                        <canvas id="registrationsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-info-circle text-primary me-2"></i>Quick Overview</h5>
+                    <div class="list-group list-group-flush small">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Published Events:</span>
+                            <span class="badge bg-success-subtle text-success rounded-pill">@Model.PublishedEvents</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Draft / Pending Events:</span>
+                            <span class="badge bg-warning-subtle text-warning rounded-pill">@Model.DraftOrPendingEvents</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Organizer Department:</span>
+                            <span class="fw-bold text-dark text-truncate" style="max-width: 150px;">@Model.Organizer.Department</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Contact Email:</span>
+                            <span class="fw-bold text-muted text-truncate" style="max-width: 150px;">@Model.Organizer.Email</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-3 border-top text-center">
+                        <a asp-action="MyEvents" class="btn btn-outline-custom w-100 btn-sm">
+                            View All My Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Registrations Table -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <h5 class="fw-bold mb-3"><i class="bi bi-people text-primary me-2"></i>Recent Student Registrations</h5>
+            @if (!Model.RecentRegistrations.Any())
+            {
+                <div class="p-4 text-center text-muted small bg-light rounded-3">
+                    No student registrations recorded yet for your events.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Student Name</th>
+                                <th>College Email</th>
+                                <th>Event Title</th>
+                                <th>Registration Date</th>
+                                <th>Attendance</th>
+                                <th class="text-end">Manage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var reg in Model.RecentRegistrations)
+                            {
+                                <tr>
+                                    <td class="fw-bold">@reg.Student.FullName</td>
+                                    <td class="small text-muted">@reg.Student.Email</td>
+                                    <td class="small text-truncate" style="max-width: 200px;">@reg.Event.Title</td>
+                                    <td class="small text-muted">@reg.RegisteredAt.ToString("MMM dd, yyyy • hh:mm tt")</td>
+                                    <td>
+                                        @if (reg.AttendanceStatus == CampusConnect.Models.AttendanceStatus.Present)
+                                        {
+                                            <span class="badge bg-success">Present</span>
+                                        }
+                                        else if (reg.AttendanceStatus == CampusConnect.Models.AttendanceStatus.Absent)
+                                        {
+                                            <span class="badge bg-danger">Absent</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Not Marked</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-action="ManageRegistrations" asp-route-id="@reg.EventId" class="btn btn-sm btn-outline-primary">
+                                            Manage
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+    <script>
+        const ctx = document.getElementById('registrationsChart').getContext('2d');
+        const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EventLabels));
+        const regData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EventRegistrationCounts));
+        const capData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EventCapacityLimits));
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Registered Students',
+                        data: regData,
+                        backgroundColor: 'rgba(79, 70, 229, 0.85)',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Seat Capacity',
+                        data: capData,
+                        backgroundColor: 'rgba(226, 232, 240, 0.85)',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 20 }
+                    }
+                }
+            }
+        });
+    </script>
+}

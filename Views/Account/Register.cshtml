@@ -1,0 +1,119 @@
+@model CampusConnect.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border shadow-sm rounded-3 p-4 bg-white">
+                <div class="text-center mb-4">
+                    <i class="bi bi-person-plus fs-1 text-primary d-block mb-2"></i>
+                    <h4 class="fw-bold mb-1">Create Account</h4>
+                    <p class="text-muted small">Join CampusConnect to participate in campus events</p>
+                </div>
+
+                <form asp-action="Register" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small p-2 mb-3" role="alert"></div>
+
+                    <!-- Role Selector — 3 options -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold text-muted d-block">Register As</label>
+                        <div class="row g-2">
+
+                            <!-- Student -->
+                            <div class="col-4">
+                                <input type="radio" class="btn-check" name="Role" id="roleStudent" value="Student" checked />
+                                <label class="btn btn-outline-primary w-100 py-2 rounded-3 text-start d-flex align-items-center gap-2" for="roleStudent">
+                                    <i class="bi bi-mortarboard fs-5"></i>
+                                    <div>
+                                        <div class="fw-bold small">Student</div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">Browse &amp; Register</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Organizer -->
+                            <div class="col-4">
+                                <input type="radio" class="btn-check" name="Role" id="roleOrganizer" value="Organizer" />
+                                <label class="btn btn-outline-success w-100 py-2 rounded-3 text-start d-flex align-items-center gap-2" for="roleOrganizer">
+                                    <i class="bi bi-calendar-plus fs-5"></i>
+                                    <div>
+                                        <div class="fw-bold small">Organizer</div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">Host Events</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Admin -->
+                            <div class="col-4">
+                                <input type="radio" class="btn-check" name="Role" id="roleAdmin" value="Admin" />
+                                <label class="btn btn-outline-danger w-100 py-2 rounded-3 text-start d-flex align-items-center gap-2" for="roleAdmin">
+                                    <i class="bi bi-shield-lock fs-5"></i>
+                                    <div>
+                                        <div class="fw-bold small">Admin</div>
+                                        <div class="text-muted" style="font-size: 0.72rem;">Manage All</div>
+                                    </div>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12">
+                            <label asp-for="FullName" class="form-label small fw-semibold text-muted">Full Name</label>
+                            <input asp-for="FullName" class="form-control" placeholder="e.g. Riyam Khan" />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Email" class="form-label small fw-semibold text-muted">Email Address</label>
+                            <input asp-for="Email" class="form-control" placeholder="yourname@email.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Department" class="form-label small fw-semibold text-muted">Department</label>
+                            <input asp-for="Department" class="form-control" placeholder="e.g. Computer Science" />
+                            <span asp-validation-for="Department" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="StudentIdentifier" class="form-label small fw-semibold text-muted">Student ID / Roll No</label>
+                            <input asp-for="StudentIdentifier" class="form-control" placeholder="e.g. CS-2026-042" />
+                            <span asp-validation-for="StudentIdentifier" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Password" class="form-label small fw-semibold text-muted">Password</label>
+                            <input asp-for="Password" class="form-control" placeholder="At least 6 characters" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ConfirmPassword" class="form-label small fw-semibold text-muted">Confirm Password</label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Repeat password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-custom w-100 py-2 mt-1">
+                        <i class="bi bi-check-circle me-1"></i> Create Account
+                    </button>
+                </form>
+
+                <div class="text-center mt-3 text-muted small">
+                    Already have an account?
+                    <a asp-action="Login" class="text-primary fw-semibold">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

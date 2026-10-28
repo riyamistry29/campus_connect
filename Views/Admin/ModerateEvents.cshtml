@@ -1,0 +1,188 @@
+@model IEnumerable<CampusConnect.Models.CollegeEvent>
+@{
+    ViewData["Title"] = "Moderate Events";
+    var currentFilter = ViewBag.CurrentFilter as CampusConnect.Models.EventStatus?;
+}
+
+<div class="dashboard-container">
+    <!-- Admin Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="d-flex align-items-center gap-2 mb-4 px-2">
+            <div class="bg-danger text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                <i class="bi bi-shield-lock-fill"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold mb-0">Admin Center</h6>
+                <span class="small text-muted" style="font-size: 0.75rem;">Platform Administration</span>
+            </div>
+        </div>
+
+        <div class="sidebar-heading">Core Administration</div>
+        <a asp-action="Dashboard" class="sidebar-nav-item">
+            <i class="bi bi-speedometer2"></i> System Overview
+        </a>
+        <a asp-action="ModerateEvents" class="sidebar-nav-item active">
+            <i class="bi bi-check2-circle"></i> Moderate Events
+        </a>
+        <a asp-action="Categories" class="sidebar-nav-item">
+            <i class="bi bi-tags"></i> Event Categories
+        </a>
+        <a asp-action="Users" class="sidebar-nav-item">
+            <i class="bi bi-people"></i> User Management
+        </a>
+        <a asp-action="AllRegistrations" class="sidebar-nav-item">
+            <i class="bi bi-receipt"></i> All Registrations
+        </a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Campus Event Moderation</h2>
+                <p class="text-muted small mb-0">Review organizer submissions, approve for publication, or reject inappropriate proposals.</p>
+            </div>
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <span class="small fw-semibold text-muted me-2">Status Filter:</span>
+                <a asp-action="ModerateEvents" class="btn btn-sm rounded-pill @(!currentFilter.HasValue ? "btn-primary" : "btn-light border")">
+                    All Events
+                </a>
+                <a asp-action="ModerateEvents" asp-route-statusFilter="@CampusConnect.Models.EventStatus.PendingApproval" 
+                   class="btn btn-sm rounded-pill @(currentFilter == CampusConnect.Models.EventStatus.PendingApproval ? "btn-warning text-dark" : "btn-light border")">
+                    Pending Approval
+                </a>
+                <a asp-action="ModerateEvents" asp-route-statusFilter="@CampusConnect.Models.EventStatus.Published" 
+                   class="btn btn-sm rounded-pill @(currentFilter == CampusConnect.Models.EventStatus.Published ? "btn-success" : "btn-light border")">
+                    Published
+                </a>
+                <a asp-action="ModerateEvents" asp-route-statusFilter="@CampusConnect.Models.EventStatus.Draft" 
+                   class="btn btn-sm rounded-pill @(currentFilter == CampusConnect.Models.EventStatus.Draft ? "btn-secondary" : "btn-light border")">
+                    Draft
+                </a>
+                <a asp-action="ModerateEvents" asp-route-statusFilter="@CampusConnect.Models.EventStatus.Rejected" 
+                   class="btn btn-sm rounded-pill @(currentFilter == CampusConnect.Models.EventStatus.Rejected ? "btn-danger" : "btn-light border")">
+                    Rejected
+                </a>
+            </div>
+        </div>
+
+        <!-- Events Moderation Table -->
+        <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+            @if (!Model.Any())
+            {
+                <div class="p-5 text-center text-muted small">
+                    <i class="bi bi-check2-circle fs-1 text-success mb-2 d-block"></i>
+                    No events found for this filter.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Event Details</th>
+                                <th>Organizer</th>
+                                <th>Category</th>
+                                <th>Start Date</th>
+                                <th>Status</th>
+                                <th class="text-end">Moderation Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ev in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold text-dark">@ev.Title</div>
+                                        <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>@ev.Venue | Cap: @ev.Capacity</small>
+                                    </td>
+                                    <td>
+                                        <div class="small fw-semibold">@ev.Organizer.FullName</div>
+                                        <small class="text-muted">@ev.Organizer.Department</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">@ev.Category.Name</span>
+                                    </td>
+                                    <td class="small">
+                                        @ev.StartDateTime.ToString("MMM dd, yyyy")<br>
+                                        <span class="text-muted">@ev.StartDateTime.ToString("hh:mm tt")</span>
+                                    </td>
+                                    <td>
+                                        @if (ev.Status == CampusConnect.Models.EventStatus.Published)
+                                        {
+                                            <span class="badge bg-success-subtle text-success">Published</span>
+                                        }
+                                        else if (ev.Status == CampusConnect.Models.EventStatus.PendingApproval)
+                                        {
+                                            <span class="badge bg-warning-subtle text-warning">Pending Approval</span>
+                                        }
+                                        else if (ev.Status == CampusConnect.Models.EventStatus.Rejected)
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger">Rejected</span>
+                                        }
+                                        else if (ev.Status == CampusConnect.Models.EventStatus.Cancelled)
+                                        {
+                                            <span class="badge bg-dark text-white">Cancelled</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary-subtle text-secondary">Draft</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" class="btn btn-outline-secondary" title="Preview Event">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+
+                                            @if (ev.Status != CampusConnect.Models.EventStatus.Published)
+                                            {
+                                                <form asp-action="ChangeStatus" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@ev.Id" />
+                                                    <input type="hidden" name="status" value="@CampusConnect.Models.EventStatus.Published" />
+                                                    <button type="submit" class="btn btn-outline-success" title="Approve & Publish">
+                                                        <i class="bi bi-check-lg"></i> Approve
+                                                    </button>
+                                                </form>
+                                            }
+
+                                            @if (ev.Status != CampusConnect.Models.EventStatus.Rejected)
+                                            {
+                                                <form asp-action="ChangeStatus" method="post" class="d-inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@ev.Id" />
+                                                    <input type="hidden" name="status" value="@CampusConnect.Models.EventStatus.Rejected" />
+                                                    <button type="submit" class="btn btn-outline-danger" title="Reject">
+                                                        <i class="bi bi-x-lg"></i> Reject
+                                                    </button>
+                                                </form>
+                                            }
+
+                                            @if (ev.Status == CampusConnect.Models.EventStatus.Published)
+                                            {
+                                                <form asp-action="ChangeStatus" method="post" class="d-inline" onsubmit="return confirm('Cancel this event?');">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@ev.Id" />
+                                                    <input type="hidden" name="status" value="@CampusConnect.Models.EventStatus.Cancelled" />
+                                                    <button type="submit" class="btn btn-outline-dark" title="Cancel Event">
+                                                        Cancel
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </main>
+</div>
